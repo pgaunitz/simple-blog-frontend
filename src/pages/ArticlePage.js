@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import ArticleList from '../components/ArticleList';
 import articleContent from './article-content';
 import NotFoundPage from './NotFoundPage';
+import CommentsList from '../components/CommentsList'
 
 const ArticlePage = ({ match }) => {
   const name = match.params.name;
@@ -14,8 +15,7 @@ const ArticlePage = ({ match }) => {
     
     const fetchData = async () => {
       const result = await axios.get(`/api/articles/${name}`);
-      console.log(result)
-      setArticleInfo({ upvotes: result.data.upvotes });
+      setArticleInfo(result.data);
     };
     fetchData();
     
@@ -29,11 +29,12 @@ const ArticlePage = ({ match }) => {
 
   return (
     <>
-      <h1>Article {article.title}</h1>
+      <h1>Article {articleInfo.title}</h1>
       <p>This line has been upvoted {articleInfo.upvotes} times</p>
       {article.content.map((paragraph, key) => (
         <p key={key}>{paragraph}</p>
       ))}
+      <CommentsList comments={articleInfo.comments}/>
       <h3>Other articles:</h3>
       <ArticleList articles={otherArticles} />
     </>
