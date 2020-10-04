@@ -1,19 +1,36 @@
-import React from 'react';
-import ArticleList from '../components/ArticleList'
-import articleContent from './article-content'
+import axios from 'axios';
+import React, { useState, useEffect } from 'react';
+import ArticleList from '../components/ArticleList';
+import articleContent from './article-content';
 import NotFoundPage from './NotFoundPage';
 
 const ArticlePage = ({ match }) => {
-  const name = match.params.name
-  const article = articleContent.find(article => article.name === name)
+  const name = match.params.name;
+  const article = articleContent.find((article) => article.name === name);
 
-  if (!article) return <NotFoundPage/>
+  const [articleInfo, setArticleInfo] = useState({ upvotes: 0, comments: [] });
 
-  const otherArticles = articleContent.filter(article => article.name !== name)
+  useEffect(() => {
+    
+    const fetchData = async () => {
+      const result = await axios.get(`/api/articles/${name}`);
+      console.log(result)
+      setArticleInfo({ upvotes: result.data.upvotes });
+    };
+    fetchData();
+    
+  }, [name]);
+
+  if (!article) return <NotFoundPage />;
+
+  const otherArticles = articleContent.filter(
+    (article) => article.name !== name
+  );
 
   return (
     <>
       <h1>Article {article.title}</h1>
+      <p>This line has been upvoted {articleInfo.upvotes} times</p>
       {article.content.map((paragraph, key) => (
         <p key={key}>{paragraph}</p>
       ))}
